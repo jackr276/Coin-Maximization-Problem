@@ -7,36 +7,58 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-struct Player{
-	u_int8_t total_money;
+enum strategy{
+	minize_gain = 0,
+	take_largest = 1
 };
 
 
-void strat_minimize_alice_gain(struct Player* Bob, struct Player* Alice){
+typedef struct{
+	u_int8_t total_money;
+} Player;
 
+
+void strat_minimize_alice_gain(Player* Bob, Player* Alice, u_int8_t coins[], int* length){
 }
 
-void strat_take_largest(struct Player* Bob, struct Player* Alice){
+void strat_take_largest(Player* Bob, u_int8_t coins[], int* length){
+	if(coins[0] > coins[*length - 1]){
+		Bob->total_money += coins[0];
+	
+		for(int i = 0; i < *length - 1; i++){
+			coins[i] = coins[i+1];	
+		}
 
+	} else {
+		Bob->total_money += coins[*length -1];
+	}
+
+	(*length)--;
 }
 
-void bob_turn(struct Player* Bob){
 
+void bob_turn(Player* Bob, u_int8_t coins[], int length, enum strategy strat){
+	
 }
 
-void alice_turn(struct Player* Alice){
+
+/**
+ * Alice will always play the same strategy
+ */
+void alice_turn(Player* Alice, u_int8_t coins[], int length){
 
 }
-
 
 
 /**
  * Program entry point, handles initial allocations and makes appropriate calls
  */
 int main(void){
-	// Our game has 2 player, Alice and Bob
-	struct Player* Bob = (struct Player*)malloc(sizeof(struct Player));	
-	struct Player* Alice = (struct Player*)malloc(sizeof(struct Player));	
+	// Our game has 2 players, Alice and Bob
+	Player* Bob = (Player*)malloc(sizeof(Player));	
+	Player* Alice = (Player*)malloc(sizeof(Player));	
+	Bob->total_money = 0;
+	Alice->total_money = 0;
 
 	// We always start off with the same coin config, in this order
 	u_int8_t coins[8] = {2, 6, 5, 2, 7, 3, 5, 4};
