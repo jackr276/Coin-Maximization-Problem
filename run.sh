@@ -15,9 +15,8 @@ if [[ ! -f ./src/coin_problem.c ]]; then
 	exit 1
 fi
 
-
 # go heavy on the warnings
-gcc -Wall -Wextra ./src/count_problem.c -o ./out/coin_problem
+gcc -Wall -Wextra ./src/coin_problem.c -o ./out/coin_problem
 
 ./out/coin_problem
 
