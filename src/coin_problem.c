@@ -9,9 +9,40 @@
 
 int solve_bob_greedy(int coins[], int length){
 	int MV[length][length];
+	
+	for(int idx = 0; idx < length; idx++){
+		for(int i = 0, j = idx; j < length; i++, j++){
+			//The results in each scenario, again representing Alice's gain
+			int a;
+			int b;
+			int c;
+	
+			//Alice chooses the ith coin, then Bob chooses i + 1 or j, whichever is largest
 
 
-	return 0;
+			//Alice chooses the jth coin, then Bob choose i or j - 1, whichever is largest
+	
+
+			//Choosing logic: Max(A[i] + min(a, b), A[j] + min(b, c))
+			//It doesn't make much sense for Alice to use this strategy here, since Bob isn't playing
+			//to minimize her gain, but she'll use it anyways
+
+			//We minimize ab and bc
+			int min_factor_ab = a < b ? a : b;
+			int min_factor_bc = b < c ? b : c;
+
+			//Add the coin values in
+			int option_ab = coins[i] + min_factor_ab;
+			int option_bc = coins[j] + min_factor_bc;
+
+			//We want the max of the 2
+			MV[i][j] = option_ab > option_bc ? option_ab : option_bc;
+
+		}
+	}
+
+
+	return MV[0][length - 1];
 }
 
 
@@ -26,7 +57,7 @@ int solve_bob_minimize(int coins[], int length){
 
 	for(int idx = 0; idx < length; idx++){
 		for(int i = 0, j = idx; j < length; i++, j++){
-			//The results of each scenario
+			//The results of each scenario, these all represent Alice's gain
 			int a;
 			int b;
 			int c;
@@ -83,10 +114,10 @@ int main(void){
 	// The sum of all the coins
 	int total_value = 34;
 
+	//Evaluate Bob playing to minimize Alice first
 	int alice_value = solve_bob_minimize(coins, 8);
 	int bob_value = total_value - alice_value;
-
-	printf("When Bob plays optimally, the results are\n\tAlice: %d\n\tBob: %d\n", alice_value, bob_value);
+	printf("When Bob plays in a way that minimizes Alice's gain, the results are:\n\tAlice: %d\n\tBob:   %d\n", alice_value, bob_value);
 
 	// Tell bash all went well
 	return 0;
