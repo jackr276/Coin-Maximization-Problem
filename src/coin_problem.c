@@ -4,62 +4,72 @@
  * This simple C program implements the Dynamic Programming Problem regarding coin choosing strategies
  */
 
-#include <stdlib.h>
-#include <sys/types.h>
-
-enum strategy{
-	minize_gain = 0,
-	take_largest = 1
-};
+#include <stdio.h>
 
 
-typedef struct{
-	u_int8_t total_money;
-} Player;
+int solve_bob_greedy(int coins[], int length){
+	int MV[length][length];
 
 
-void strat_minimize_alice_gain(Player* Bob, Player* Alice, u_int8_t* coins[], int* length){
+	return 0;
 }
 
 
 /**
- * Bob's Greedy strategy -- always takes the largest coin at either end
+ * In this scenario, Bob and Alice are equally clever. They think about eachother's moves not in the immediate,
+ * but two moves ahead. In this situation, Bob always chooses the coin that will minimize the amount that Alice
+ * can get, so in this scenario, Alice always picks the coin that will give her more value 2 moves ahead
  */
-void strat_take_largest(Player* Bob, u_int8_t* coins[], int* length){
-	//Always take the largest coin	
-	if(*coins[0] > *coins[*length - 1]){
-		Bob->total_money += *coins[0];
+int solve_bob_minimize(int coins[], int length){
+	//A matrix for storing the result of each turn
+	int MV[length][length];
+
+	for(int idx = 0; idx < length; idx++){
+		for(int i = 0, j = idx; j < length; i++, j++){
+			//The results of each scenario
+			int a;
+			int b;
+			int c;
+
+			//Alice chooses i and then Bob chooses i + 1
+			if(i + 2 <= j){
+				a = MV[i+2][j];
+			} else {
+				a = 0;
+			}
+
+			//Alice chooses i and Bob chooses j, or vice versa(Opposite ends scenario)
+			if(i + 1 <= j - 1){
+				b = MV[i+1][j-1];	
+			} else {
+				b = 0;
+			}
+
+			//Alice chooses j, and Bob then chooses j - 1
+			if(i <= j - 2){
+				c = MV[i][j-2];
+			} else {
+				c = 0;
+			}
+		
+			//Choosing logic: Max(A[i] + min(a, b), A[j] + min(b, c))
+			//We use this logic because we always assume that Bob is going to play optimally
+			//in trying to thwart Alice, so we always minimize the 2 options
+
+			//We minimize ab and bc
+			int min_factor_ab = a < b ? a : b;
+			int min_factor_bc = b < c ? b : c;
+
+			//Add the coin values in
+			int option_ab = coins[i] + min_factor_ab;
+			int option_bc = coins[j] + min_factor_bc;
+
+			//We want the max of the 2
+			MV[i][j] = option_ab > option_bc ? option_ab : option_bc;
+		}
+	}
 	
-		//Advance pointer up by 1 to erase the first number
-		(*coins)++;
-	} else {
-		//The number here will be gone implicitely 
-		Bob->total_money += *coins[*length -1];
-	}
-
-	//Decrement length
-	(*length)--;
-}
-
-
-/**
- * Bob takes his turn. Depending on our simulation, he will choose the greedy strategy or the
- * one that minize's Alice's gain
- */
-void bob_turn(Player* Bob, Player* Alice, u_int8_t* coins[], int* length, enum strategy strat){
-	if(strat == minize_gain){
-		strat_minimize_alice_gain(Bob, Alice, coins, length);
-	} else {
-		strat_take_largest(Bob, coins, length);	
-	}
-}
-
-
-/**
- * Alice will always play the same strategy
- */
-void alice_turn(Player* Alice, u_int8_t coins[], int length){
-
+	return MV[0][length - 1];
 }
 
 
@@ -67,19 +77,16 @@ void alice_turn(Player* Alice, u_int8_t coins[], int length){
  * Program entry point, handles initial allocations and makes appropriate calls
  */
 int main(void){
-	// Our game has 2 players, Alice and Bob
-	Player* Bob = (Player*)malloc(sizeof(Player));	
-	Player* Alice = (Player*)malloc(sizeof(Player));	
-	Bob->total_money = 0;
-	Alice->total_money = 0;
 
 	// We always start off with the same coin config, in this order
-	u_int8_t coins[8] = {2, 6, 5, 2, 7, 3, 5, 4};
-	int size = 8;
+	int coins[8] = {2, 6, 5, 2, 7, 3, 5, 4};
+	// The sum of all the coins
+	int total_value = 34;
 
-	// Not necessary but good practice -- clean up our garbage
-	free(Bob);
-	free(Alice);
+	int alice_value = solve_bob_minimize(coins, 8);
+	int bob_value = total_value - alice_value;
+
+	printf("When Bob plays optimally, the results are\n\tAlice: %d\n\tBob: %d\n", alice_value, bob_value);
 
 	// Tell bash all went well
 	return 0;
