@@ -18,27 +18,40 @@ typedef struct{
 } Player;
 
 
-void strat_minimize_alice_gain(Player* Bob, Player* Alice, u_int8_t coins[], int* length){
+void strat_minimize_alice_gain(Player* Bob, Player* Alice, u_int8_t* coins[], int* length){
 }
 
-void strat_take_largest(Player* Bob, u_int8_t coins[], int* length){
-	if(coins[0] > coins[*length - 1]){
-		Bob->total_money += coins[0];
-	
-		for(int i = 0; i < *length - 1; i++){
-			coins[i] = coins[i+1];	
-		}
 
+/**
+ * Bob's Greedy strategy -- always takes the largest coin at either end
+ */
+void strat_take_largest(Player* Bob, u_int8_t* coins[], int* length){
+	//Always take the largest coin	
+	if(*coins[0] > *coins[*length - 1]){
+		Bob->total_money += *coins[0];
+	
+		//Advance pointer up by 1 to erase the first number
+		(*coins)++;
 	} else {
-		Bob->total_money += coins[*length -1];
+		//The number here will be gone implicitely 
+		Bob->total_money += *coins[*length -1];
 	}
 
+	//Decrement length
 	(*length)--;
 }
 
 
-void bob_turn(Player* Bob, u_int8_t coins[], int length, enum strategy strat){
-	
+/**
+ * Bob takes his turn. Depending on our simulation, he will choose the greedy strategy or the
+ * one that minize's Alice's gain
+ */
+void bob_turn(Player* Bob, Player* Alice, u_int8_t* coins[], int* length, enum strategy strat){
+	if(strat == minize_gain){
+		strat_minimize_alice_gain(Bob, Alice, coins, length);
+	} else {
+		strat_take_largest(Bob, coins, length);	
+	}
 }
 
 
@@ -62,7 +75,7 @@ int main(void){
 
 	// We always start off with the same coin config, in this order
 	u_int8_t coins[8] = {2, 6, 5, 2, 7, 3, 5, 4};
-
+	int size = 8;
 
 	// Not necessary but good practice -- clean up our garbage
 	free(Bob);
