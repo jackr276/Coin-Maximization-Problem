@@ -7,6 +7,9 @@
 #include <stdio.h>
 
 
+/**
+ * In this case, Alice knows that Bob will always be greedy, so she can adjust accordingly
+ */
 int solve_bob_greedy(int coins[], int length){
 	int MV[length][length];
 	
