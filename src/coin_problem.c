@@ -127,6 +127,7 @@ int main(void){
 	int bob_value = total_value - alice_value;
 	printf("When Bob plays in a way that minimizes Alice's gain, the results are:\n\tAlice: %d\n\tBob:   %d\n", alice_value, bob_value);
 
+	//Now evaluate Bob playing greedily
 	bob_value = solve_bob_greedy(coins, 8);
 	alice_value = total_value - bob_value;
 	printf("When Bob plays greedily, the results are \n\tAlice: %d\n\tBob:   %d\n", alice_value, bob_value);
