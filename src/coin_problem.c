@@ -11,58 +11,40 @@
  * In this case, it is easier for us to solve for Bob because we know what he will take
  */
 int solve_bob_greedy(int coins[], int length){
-	int MV[length][length];
-	
-	for(int idx = 0; idx < length; idx++){
-		for(int i = 0, j = idx; j < length; i++, j++){
-			//The results in each scenario, again representing Alice's gain
-			int opt_1;
-			int opt_2;
-			int opt_3;
-	
-			//Alice chooses i and then Bob chooses i + 1 or j, whichever is biggers
-			if(coins[i + 1] >= coins[j]){
-				//Alice could choose the i + 2
-				opt_1 = MV[i+2][j];
+	int bob_coins[length / 2];
+
+	int i = 0;
+	int j = length - 1;
+	int turn = 1;
+	int bob_index = 0;	
+
+	while(i <= j){
+		//Bob's turn
+		if(turn % 2 != 0){
+			if(coins[i] > coins[j]){
+				bob_coins[bob_index] = coins[i];		
+				i++;
 			} else {
-				opt_1 = MV[i+1][j];
+				bob_coins[bob_index] = coins[j];
+				j--;
 			}
-
-			//Alice chooses i and Bob chooses j, or vice versa(Opposite ends scenario)
-			if(coins[i + 1] >= coins[j - 1]){
-				opt_2 = MV[i + 1][j - 1];	
+			bob_index++;
+		} else {
+			if(coins[i] > coins[j]){
+				i++;
 			} else {
-				opt_2 = 0;
+				j--;
 			}
-
-			//Alice chooses j, and Bob then chooses j - 1
-			if(i <= j - 2){
-				opt_3 = MV[i][j - 2];
-			} else {
-				opt_3 = 0;
-			}
-		
-			//Choosing logic: Max(A[i] + min(a, b), A[j] + min(b, c))
-			// We use this logic this time because we now know that Bob is trying to choose the largest coin possible
-			// each time, and has no other consideration in his gameplay
-			//
-
-			//We minimize ab and bc
-			int max_factor_ab = opt_1 < opt_2 ? opt_1 : opt_2;
-			int max_factor_bc = opt_2 < opt_3 ? opt_2 : opt_3;
-
-
-			//Add the coin values in
-			int option_ab = coins[i] + max_factor_ab;
-			int option_bc = coins[j] + max_factor_bc;
-
-			//We want the max of the 2
-			MV[i][j] = option_ab > option_bc ? option_ab : option_bc;
 		}
+		turn++;
+	} 
+
+	int sum = 0;
+	for(int i = 0; i <= bob_index; i++){
+		sum += bob_coins[i];
 	}
 
-
-	return MV[0][length - 1];
+	return sum;
 }
 
 
@@ -139,7 +121,9 @@ int main(void){
 	int bob_value = total_value - alice_value;
 	printf("When Bob plays in a way that minimizes Alice's gain, the results are:\n\tAlice: %d\n\tBob:   %d\n", alice_value, bob_value);
 
-
+	bob_value = solve_bob_greedy(coins, 8);
+	alice_value = total_value - bob_value;
+	printf("When Bob plays greedily, the results are \n\tAlice: %d\n\tBob:   %d\n", alice_value, bob_value);
 
 	// Tell bash all went well
 	return 0;
