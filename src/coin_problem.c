@@ -15,13 +15,15 @@ int solve_bob_greedy(int coins[], int length){
 
 	int i = 0;
 	int j = length - 1;
+	//Alice goes first
 	int turn = 1;
 	int bob_index = 0;	
-	
+	int sum = 0;
+
 	//While there are still coins to take
 	while(i <= j){
 		//Bob's turn
-		if(turn % 2 != 0){
+		if(turn % 2 == 0){
 			//Bob always takes the largest coin
 			if(coins[i] > coins[j]){
 				bob_coins[bob_index] = coins[i];		
@@ -42,13 +44,10 @@ int solve_bob_greedy(int coins[], int length){
 		//Change the turn
 		turn++;
 	} 
-
-	//Sum up the results
-	int sum = 0;
-	for(int i = 0; i <= bob_index; i++){
+	
+	for(int i = 0; i < bob_index; i++){
 		sum += bob_coins[i];
 	}
-	
 	//Return how much Bob made
 	return sum;
 }
