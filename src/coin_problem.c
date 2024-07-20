@@ -8,7 +8,7 @@
 
 
 /**
- * In this case, Alice knows that Bob will always be greedy, so she can adjust accordingly
+ * In this case, it is easier for us to solve for Bob because we know what he will take
  */
 int solve_bob_greedy(int coins[], int length){
 	int MV[length][length];
@@ -16,31 +16,48 @@ int solve_bob_greedy(int coins[], int length){
 	for(int idx = 0; idx < length; idx++){
 		for(int i = 0, j = idx; j < length; i++, j++){
 			//The results in each scenario, again representing Alice's gain
-			int a;
-			int b;
-			int c;
+			int opt_1;
+			int opt_2;
+			int opt_3;
 	
-			//Alice chooses the ith coin, then Bob chooses i + 1 or j, whichever is largest
+			//Alice chooses i and then Bob chooses i + 1 or j, whichever is biggers
+			if(coins[i + 1] >= coins[j]){
+				//Alice could choose the i + 2
+				opt_1 = MV[i+2][j];
+			} else {
+				opt_1 = MV[i+1][j];
+			}
 
+			//Alice chooses i and Bob chooses j, or vice versa(Opposite ends scenario)
+			if(coins[i + 1] >= coins[j - 1]){
+				opt_2 = MV[i + 1][j - 1];	
+			} else {
+				opt_2 = 0;
+			}
 
-			//Alice chooses the jth coin, then Bob choose i or j - 1, whichever is largest
-	
-
+			//Alice chooses j, and Bob then chooses j - 1
+			if(i <= j - 2){
+				opt_3 = MV[i][j - 2];
+			} else {
+				opt_3 = 0;
+			}
+		
 			//Choosing logic: Max(A[i] + min(a, b), A[j] + min(b, c))
-			//It doesn't make much sense for Alice to use this strategy here, since Bob isn't playing
-			//to minimize her gain, but she'll use it anyways
+			// We use this logic this time because we now know that Bob is trying to choose the largest coin possible
+			// each time, and has no other consideration in his gameplay
+			//
 
 			//We minimize ab and bc
-			int min_factor_ab = a < b ? a : b;
-			int min_factor_bc = b < c ? b : c;
+			int max_factor_ab = opt_1 < opt_2 ? opt_1 : opt_2;
+			int max_factor_bc = opt_2 < opt_3 ? opt_2 : opt_3;
+
 
 			//Add the coin values in
-			int option_ab = coins[i] + min_factor_ab;
-			int option_bc = coins[j] + min_factor_bc;
+			int option_ab = coins[i] + max_factor_ab;
+			int option_bc = coins[j] + max_factor_bc;
 
 			//We want the max of the 2
 			MV[i][j] = option_ab > option_bc ? option_ab : option_bc;
-
 		}
 	}
 
@@ -61,29 +78,29 @@ int solve_bob_minimize(int coins[], int length){
 	for(int idx = 0; idx < length; idx++){
 		for(int i = 0, j = idx; j < length; i++, j++){
 			//The results of each scenario, these all represent Alice's gain
-			int a;
-			int b;
-			int c;
+			int opt_1;
+			int opt_2;
+			int opt_3;
 
 			//Alice chooses i and then Bob chooses i + 1
 			if(i + 2 <= j){
-				a = MV[i+2][j];
+				opt_1 = MV[i+2][j];
 			} else {
-				a = 0;
+				opt_1 = 0;
 			}
 
 			//Alice chooses i and Bob chooses j, or vice versa(Opposite ends scenario)
 			if(i + 1 <= j - 1){
-				b = MV[i+1][j-1];	
+				opt_2 = MV[i+1][j-1];	
 			} else {
-				b = 0;
+				opt_2 = 0;
 			}
 
 			//Alice chooses j, and Bob then chooses j - 1
 			if(i <= j - 2){
-				c = MV[i][j-2];
+				opt_3 = MV[i][j-2];
 			} else {
-				c = 0;
+				opt_3 = 0;
 			}
 		
 			//Choosing logic: Max(A[i] + min(a, b), A[j] + min(b, c))
@@ -91,8 +108,8 @@ int solve_bob_minimize(int coins[], int length){
 			//in trying to thwart Alice, so we always minimize the 2 options
 
 			//We minimize ab and bc
-			int min_factor_ab = a < b ? a : b;
-			int min_factor_bc = b < c ? b : c;
+			int min_factor_ab = opt_1 < opt_2 ? opt_1 : opt_2;
+			int min_factor_bc = opt_2 < opt_3 ? opt_2 : opt_3;
 
 			//Add the coin values in
 			int option_ab = coins[i] + min_factor_ab;
@@ -121,6 +138,8 @@ int main(void){
 	int alice_value = solve_bob_minimize(coins, 8);
 	int bob_value = total_value - alice_value;
 	printf("When Bob plays in a way that minimizes Alice's gain, the results are:\n\tAlice: %d\n\tBob:   %d\n", alice_value, bob_value);
+
+
 
 	// Tell bash all went well
 	return 0;
