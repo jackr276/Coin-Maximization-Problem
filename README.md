@@ -58,3 +58,62 @@ int solve_bob_minimize(int coins[], int length){
 	return MV[0][length - 1];
 }
 ```
+
+When this code is run, the following output is produced for Alice's optimal solution:
+```console
+When Bob plays in a way that minimizes Alice's gain, the results are:
+	Alice: 19
+	Bob:   15
+```
+
+Just to show a contrast, the greedy solution for Bob and Alice is also implemented. The Greedy solution invovles both players just taking the largest coin on either end of the line. It is not optimal for either party, and winning and losing in this case simply relies on who goes first, and the order of the line. Here is the algorithm for that: 
+```c
+int solve_bob_greedy(int coins[], int length){
+	int bob_coins[length / 2];
+
+	int i = 0;
+	int j = length - 1;
+	//Alice goes first
+	int turn = 1;
+	int bob_index = 0;	
+	int sum = 0;
+
+	//While there are still coins to take
+	while(i <= j){
+		//Bob's turn
+		if(turn % 2 == 0){
+			//Bob always takes the largest coin
+			if(coins[i] > coins[j]){
+				bob_coins[bob_index] = coins[i];		
+				i++;
+			} else {
+				bob_coins[bob_index] = coins[j];
+				j--;
+			}
+			bob_index++;
+		//Alice's turn
+		} else {
+			if(coins[i] > coins[j]){
+				i++;
+			} else {
+				j--;
+			}
+		}
+		//Change the turn
+		turn++;
+	} 
+	
+	for(int i = 0; i < bob_index; i++){
+		sum += bob_coins[i];
+	}
+	//Return how much Bob made
+	return sum;
+}
+```
+When this is run, the results are as follows:
+```console
+When Bob plays greedily, the results are 
+	Alice: 15
+	Bob:   19
+```
+As we can see, Bob wins by the same margin as Alice, but only by the luck of the draw, because he goes second. That is why this solution is not optimal.
